@@ -1,0 +1,31 @@
+# ============================================================
+# 公司目录：采集目标
+# ============================================================
+#
+# adapter —— 该公司的招聘站用的是哪套后端
+#     feishu  : 飞书招聘 ATSX。字节 / MiniMax / 月之暗面 等一大批在用。
+#               一个适配器接一串公司，只需要换 host。
+#     moka    : Moka 招聘门户（零灰区备选源，见 README）
+#
+# host    —— 招聘站域名。飞书形态有两种：
+#               · 自建域名       jobs.bytedance.com
+#               · 飞书子域名     {租户 id}.jobs.feishu.cn
+#
+# portal_type —— 飞书接口的参数，实测 6 = 社招。
+#                不同租户可能不同；搜不到岗位时先怀疑这个值。
+#
+# ⚠️ 加公司之前：先确认它的招聘站 robots.txt 没有禁止该路径，
+#    并把它记在 README 的「数据来源」表里。
+
+companies:
+  - name: bytedance
+    label: 字节跳动
+    adapter: feishu
+    host: jobs.bytedance.com
+    portal_type: 6
+
+  - name: minimax
+    label: MiniMax
+    adapter: feishu
+    host: vrfi1sk8a0.jobs.feishu.cn
+    portal_type: 6
