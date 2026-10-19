@@ -45,6 +45,7 @@ class FeishuCollector(BaseCollector):
         company: str,
         *,
         portal_type: int = 6,
+        job_path: str | None = None,
         **kwargs,
     ) -> None:
         super().__init__(**kwargs)
@@ -52,14 +53,21 @@ class FeishuCollector(BaseCollector):
         self.company = company
         # portal_type 实测 6 = 社招。不同租户可能不同，放进 companies.yaml 可配。
         self.portal_type = portal_type
+        # 详情页路径。**每家都不一样**（2026-10-19 逐个实测过）：
+        #   字节     /experienced/position/{id}/detail
+        #   MiniMax  /index/position/{id}/detail
+        #   百川     /baichuanzhaopin/position/{id}/detail
+        #   零一万物 /index/position/{id}/detail
+        #   面壁     /career/position/{id}/detail
+        #   智谱     /referral/position/{id}/detail
+        #   商汤     /exp/position/{id}/detail
+        # 默认值只是字节的兜底，正式接入必须写进 companies.yaml，
+        # 否则报告里的链接点开是 404。
+        self.job_path = job_path or "/experienced/position/{id}/detail"
 
     def job_url(self, source_id: str) -> str:
-        """岗位详情页地址。
-
-        各家的路径前缀不完全一样（字节是 /experienced/position/{id}/detail），
-        所以做成方法，方便某家特例时在子类覆盖。
-        """
-        return f"https://{self.host}/experienced/position/{source_id}/detail"
+        """岗位详情页地址。路径由 `job_path` 模板决定（见 `__init__` 的实测清单）。"""
+        return f"https://{self.host}{self.job_path.format(id=source_id)}"
 
     def fetch(self, keyword: str, limit: int = 50) -> Iterator[RawPosting]:
         """按关键词翻页拉取。

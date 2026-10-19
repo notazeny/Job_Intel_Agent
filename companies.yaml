@@ -3,16 +3,22 @@
 # ============================================================
 #
 # adapter —— 该公司的招聘站用的是哪套后端
-#     feishu  : 飞书招聘 ATSX。字节 / MiniMax / 月之暗面 等一大批在用。
-#               一个适配器接一串公司，只需要换 host。
+#     feishu  : 飞书招聘 ATSX。字节 / MiniMax / 百川 / 零一万物 / 面壁 / 智谱 / 商汤
+#               等一大批在用。一个适配器接一串公司，只需要换 host。
 #     moka    : Moka 招聘门户（零灰区备选源，见 README）
 #
 # host    —— 招聘站域名。飞书形态有两种：
-#               · 自建域名       jobs.bytedance.com
+#               · 自建域名       jobs.bytedance.com  / hr-jobs.sensetime.com
 #               · 飞书子域名     {租户 id}.jobs.feishu.cn
 #
 # portal_type —— 飞书接口的参数，实测 6 = 社招。
 #                不同租户可能不同；搜不到岗位时先怀疑这个值。
+#
+# job_path —— 岗位详情页路径模板（{id} 会被替换成岗位 ID）。
+#            ⚠️ **每家都不一样**，2026-10-19 逐个实测过：
+#               字节 /experienced/…   面壁 /career/…   百川 /baichuanzhaopin/…
+#               零一万物 /index/…     智谱 /referral/… 商汤 /exp/…   MiniMax /index/…
+#            不填会退回字节的默认值，报告里的链接对其他公司就是 404。
 #
 # ⚠️ 加公司之前：先确认它的招聘站 robots.txt 没有禁止该路径，
 #    并把它记在 README 的「数据来源」表里。
@@ -23,9 +29,54 @@ companies:
     adapter: feishu
     host: jobs.bytedance.com
     portal_type: 6
+    job_path: /experienced/position/{id}/detail
 
   - name: minimax
     label: MiniMax
     adapter: feishu
     host: vrfi1sk8a0.jobs.feishu.cn
     portal_type: 6
+    job_path: /index/position/{id}/detail
+
+  # ---- 2026-10-19 实测可接入（1 次请求验证，code=0）----
+
+  - name: baichuan
+    label: 百川智能
+    adapter: feishu
+    host: cq6qe6bvfr6.jobs.feishu.cn
+    portal_type: 6
+    job_path: /baichuanzhaopin/position/{id}/detail
+
+  - name: 01ai
+    label: 零一万物
+    adapter: feishu
+    host: 01ai.jobs.feishu.cn
+    portal_type: 6
+    job_path: /index/position/{id}/detail
+
+  - name: modelbest
+    label: 面壁智能
+    adapter: feishu
+    host: modelbest.jobs.feishu.cn
+    portal_type: 6
+    job_path: /career/position/{id}/detail
+
+  # 商汤是**自定义域名**接入 ATSX（不是 *.jobs.feishu.cn），
+  # 同时也验证了适配器的 host 是真的可配。
+  - name: sensetime
+    label: 商汤科技
+    adapter: feishu
+    host: hr-jobs.sensetime.com
+    portal_type: 6
+    job_path: /exp/position/{id}/detail
+
+  - name: zhipu
+    label: 智谱AI
+    adapter: feishu
+    host: zhipu-ai.jobs.feishu.cn
+    portal_type: 6
+    job_path: /referral/position/{id}/detail
+
+  # ⚠️ 暂不接入：
+  #   moonshot  —— 接口可达但关键词搜不到岗位，疑似内推租户，portal_type 待摸
+  #   阶跃星辰 / 旷视 / DeepSeek —— Moka；科大讯飞 —— 北森 zhiye

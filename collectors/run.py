@@ -60,6 +60,7 @@ def build_collector(spec: dict, collect_cfg: dict, archive_dir: Path):
             host=spec["host"],
             company=spec["name"],
             portal_type=spec.get("portal_type", 6),
+            job_path=spec.get("job_path"),
             **common,
         )
     return cls(company=spec["name"], **common)
